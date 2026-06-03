@@ -5,7 +5,7 @@ using groupProject.Observers;
 namespace groupProject.Models {
   public class Budget : ISubject {
     private List<IObserver> _observers = new List<IObserver>();
-    
+
     public decimal TotalIncome { get; set; }
     public decimal TotalExpenses { get; set; }
     public decimal RemainingBudget { get; set; }
@@ -18,6 +18,10 @@ namespace groupProject.Models {
       RemainingBudget = totalIncome;
       CreatedAt = DateTime.Now;
       Expenses = new List<Expense>();
+    }
+
+    public Budget()
+    {
     }
 
     public void Attach(IObserver observer) {

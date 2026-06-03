@@ -1,6 +1,4 @@
 ﻿using BudgetApp.Models;
-using System;
-using System.Collections.Generic;
 
 namespace BudgetApp.Factory
 {
@@ -50,6 +48,11 @@ namespace BudgetApp.Factory
         }
       }
       return null;
+    }
+
+    internal static IEnumerable<object> GetAllCategories()
+    {
+      throw new NotImplementedException();
     }
   }
 }

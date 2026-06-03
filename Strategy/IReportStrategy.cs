@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using BudgetApp.Models;
+﻿using BudgetApp.Models;
+using groupProject.Models;
 
 namespace BudgetApp.Strategy {
   // Паттерн Strategy: интерфейс стратегии отчета

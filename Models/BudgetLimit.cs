@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BudgetApp.Models {
+﻿namespace BudgetApp.Models {
   public class BudgetLimit {
     public string CategoryName { get; set; }
     public decimal MonthlyLimit { get; set; }
@@ -38,6 +36,11 @@ namespace BudgetApp.Models {
 
     public override string ToString() {
       return $"{CategoryName}: {CurrentSpending:C} / {MonthlyLimit:C} ({GetUsedPercent():F0}%) - {GetWarningLevel()}";
+    }
+
+    internal static object Find(Func<object, bool> value)
+    {
+      throw new NotImplementedException();
     }
   }
 }
