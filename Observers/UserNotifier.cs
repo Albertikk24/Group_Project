@@ -1,7 +1,7 @@
 ﻿using System;
 using BudgetApp.Infrastructure;
 
-namespace groupProject.Infrastructure.Observers {
+namespace groupProject.Observers {
   // Конкретный наблюдатель
   public class UserNotifier : IObserver {
     private string _userName;

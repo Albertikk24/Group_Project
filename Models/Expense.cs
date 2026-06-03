@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BudgetApp.Models {
+﻿namespace BudgetApp.Models {
   public class Expense {
     public string Description { get; set; }
     public decimal Amount { get; set; }

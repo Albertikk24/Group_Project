@@ -1,7 +1,8 @@
 ﻿using BudgetApp.Infrastructure;
-using groupProject.Infrastructure.Observers;
+using BudgetApp.Models;
+using groupProject.Observers;
 
-namespace BudgetApp.Models {
+namespace groupProject.Models {
   public class Budget : ISubject {
     private List<IObserver> _observers = new List<IObserver>();
     

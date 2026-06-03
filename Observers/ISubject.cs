@@ -1,4 +1,4 @@
-﻿namespace groupProject.Infrastructure.Observers {
+﻿namespace groupProject.Observers {
   // Паттерн Observer: интерфейс наблюдаемого объекта
   public interface ISubject {
     void Attach(IObserver observer);
