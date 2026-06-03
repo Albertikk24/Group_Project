@@ -1,5 +1,4 @@
 ﻿using BudgetApp.Models;
-using groupProject.Models;
 
 namespace BudgetApp.Strategy {
   // Паттерн Strategy: интерфейс стратегии отчета

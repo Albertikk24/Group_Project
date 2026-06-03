@@ -1,20 +1,19 @@
 ﻿using BudgetApp.Models;
 
-namespace BudgetApp.Factory
-{
-  public class EntertainmentCategoryFactory : ICategoryFactory
-  {
-    public Category CreateCategory()
-    {
+namespace BudgetApp.Factory {
+  // Фабрика для категории "Развлечения"
+  public class EntertainmentCategoryFactory : ICategoryFactory {
+    private const decimal MONTHLY_LIMIT = 8000m;
+
+    public Category CreateCategory() {
       return new Category(
         name: "Развлечения",
         description: "Кино, игры, хобби, отдых",
-        monthlyLimit: 8000m
+        monthlyLimit: MONTHLY_LIMIT
       );
     }
 
-    public string GetCategoryType()
-    {
+    public string GetCategoryType() {
       return "Entertainment";
     }
   }

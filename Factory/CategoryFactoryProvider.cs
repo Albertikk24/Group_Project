@@ -1,14 +1,12 @@
 ﻿using BudgetApp.Models;
 
-namespace BudgetApp.Factory
-{
+namespace BudgetApp.Factory {
   // Провайдер для работы со всеми фабриками
-  public static class CategoryFactoryProvider
-  {
+  public static class CategoryFactoryProvider {
     private static List<ICategoryFactory> _factories;
 
-    static CategoryFactoryProvider()
-    {
+    // Статический конструктор - инициализация фабрик
+    static CategoryFactoryProvider() {
       _factories = new List<ICategoryFactory> {
         new FoodCategoryFactory(),
         new TransportCategoryFactory(),
@@ -17,42 +15,36 @@ namespace BudgetApp.Factory
       };
     }
 
-    public static List<Category> CreateAllCategories()
-    {
-      var categories = new List<Category>();
-      foreach (var factory in _factories)
-      {
-        categories.Add(factory.CreateCategory());
+    // Создание всех категорий через фабрики
+    public static List<Category> CreateAllCategories() {
+      List<Category> categories = new List<Category>();
+      for (int factoryIndex = 0; factoryIndex < _factories.Count; ++factoryIndex) {
+        ICategoryFactory currentFactory = _factories[factoryIndex];
+        categories.Add(currentFactory.CreateCategory());
       }
       return categories;
     }
 
-    public static List<string> GetAllCategoryNames()
-    {
-      var names = new List<string>();
-      foreach (var factory in _factories)
-      {
-        names.Add(factory.CreateCategory().Name);
+    // Получение названий всех категорий
+    public static List<string> GetAllCategoryNames() {
+      List<string> names = new List<string>();
+      for (int factoryIndex = 0; factoryIndex < _factories.Count; ++factoryIndex) {
+        ICategoryFactory currentFactory = _factories[factoryIndex];
+        names.Add(currentFactory.CreateCategory().Name);
       }
       return names;
     }
 
-    public static Category? GetCategoryByName(string name)
-    {
-      foreach (var factory in _factories)
-      {
-        var category = factory.CreateCategory();
-        if (category.Name == name)
-        {
+    // Поиск категории по названию
+    public static Category? GetCategoryByName(string name) {
+      for (int factoryIndex = 0; factoryIndex < _factories.Count; ++factoryIndex) {
+        ICategoryFactory currentFactory = _factories[factoryIndex];
+        Category category = currentFactory.CreateCategory();
+        if (category.Name == name) {
           return category;
         }
       }
       return null;
-    }
-
-    internal static IEnumerable<object> GetAllCategories()
-    {
-      throw new NotImplementedException();
     }
   }
 }

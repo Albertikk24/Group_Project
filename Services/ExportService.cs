@@ -1,73 +1,69 @@
-﻿using BudgetApp.Models;
-using groupProject.Models;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using BudgetApp.Models;
+using BudgetApp.Infrastructure;
 
-namespace BudgetApp.Services
-{
-  public static class ExportService
-  {
-    private static string _exportPath = "Exports";
+namespace BudgetApp.Services {
+  // Сервис для экспорта данных в CSV и JSON
+  public static class ExportService {
+    private const string EXPORT_FOLDER = "Exports";
 
-    static ExportService()
-    {
-      if (!Directory.Exists(_exportPath))
-      {
-        Directory.CreateDirectory(_exportPath);
+    // Статический конструктор - создание папки для экспорта
+    static ExportService() {
+      if (!Directory.Exists(EXPORT_FOLDER)) {
+        Directory.CreateDirectory(EXPORT_FOLDER);
+        Logger.Instance.Log($"Создана папка для экспорта: {EXPORT_FOLDER}");
       }
     }
 
+    // ========== ЭКСПОРТ В CSV ==========
     // Экспорт расходов в CSV
-    public static void ExportExpensesToCsv(List<Expense> expenses, string? filename = null)
-    {
-      if (filename == null)
-      {
+    public static void ExportExpensesToCsv(List<Expense> expenses, string? filename = null) {
+      if (filename == null) {
         filename = $"expenses_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
       }
 
-      string fullPath = Path.Combine(_exportPath, filename);
+      string fullPath = Path.Combine(EXPORT_FOLDER, filename);
       StringBuilder sb = new StringBuilder();
 
-      // Заголовки
+      // Заголовки CSV
       sb.AppendLine("Дата;Описание;Сумма;Категория");
 
       // Данные
-      foreach (var expense in expenses)
-      {
-        sb.AppendLine($"{expense.Date:dd.MM.yyyy};{expense.Description};{expense.Amount};{expense.CategoryName}");
+      for (int expenseIndex = 0; expenseIndex < expenses.Count; ++expenseIndex) {
+        Expense currentExpense = expenses[expenseIndex];
+        sb.AppendLine($"{currentExpense.Date:dd.MM.yyyy};{currentExpense.Description};{currentExpense.Amount};{currentExpense.CategoryName}");
       }
 
       File.WriteAllText(fullPath, sb.ToString(), Encoding.UTF8);
       Console.WriteLine($"Экспорт расходов выполнен: {fullPath}");
+      Logger.Instance.Log($"Экспорт расходов в CSV: {filename}");
     }
 
     // Экспорт отчета в CSV
-    public static void ExportReportToCsv(string reportContent, string reportType, string? filename = null)
-    {
-      if (filename == null)
-      {
+    public static void ExportReportToCsv(string reportContent, string reportType, string? filename = null) {
+      if (filename == null) {
         filename = $"{reportType}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
       }
 
-      string fullPath = Path.Combine(_exportPath, filename);
+      string fullPath = Path.Combine(EXPORT_FOLDER, filename);
       File.WriteAllText(fullPath, reportContent, Encoding.UTF8);
       Console.WriteLine($"Экспорт отчета выполнен: {fullPath}");
+      Logger.Instance.Log($"Экспорт отчета {reportType} в CSV: {filename}");
     }
 
+    // ========== ЭКСПОРТ В JSON ==========
     // Экспорт бюджета в JSON
-    public static void ExportBudgetToJson(Budget budget, List<Expense> expenses, List<Saving> savings, string? filename = null)
-    {
-      if (filename == null)
-      {
+    public static void ExportBudgetToJson(Budget budget, List<Expense> expenses, List<Saving> savings, string? filename = null) {
+      if (filename == null) {
         filename = $"budget_{DateTime.Now:yyyyMMdd_HHmmss}.json";
       }
 
-      string fullPath = Path.Combine(_exportPath, filename);
+      string fullPath = Path.Combine(EXPORT_FOLDER, filename);
 
-      var exportData = new
-      {
-        Budget = new
-        {
+      // Формирование объекта для экспорта
+      var exportData = new {
+        Budget = new {
           budget.TotalIncome,
           budget.TotalExpenses,
           budget.RemainingBudget,
@@ -78,29 +74,28 @@ namespace BudgetApp.Services
         ExportDate = DateTime.Now
       };
 
+      // Сериализация в JSON с отступами
       string json = JsonSerializer.Serialize(exportData, new JsonSerializerOptions { WriteIndented = true });
       File.WriteAllText(fullPath, json, Encoding.UTF8);
       Console.WriteLine($"Экспорт бюджета выполнен: {fullPath}");
+      Logger.Instance.Log($"Экспорт бюджета в JSON: {filename}");
     }
 
-    // Показать все файлы экспорта
-    public static void ShowExportFiles()
-    {
+    // Показ всех файлов экспорта
+    public static void ShowExportFiles() {
       string output = "\n=== ФАЙЛЫ ЭКСПОРТА ===\n";
-      var files = Directory.GetFiles(_exportPath);
+      string[] files = Directory.GetFiles(EXPORT_FOLDER);
 
-      if (files.Length == 0)
-      {
+      if (files.Length == 0) {
         output += "Нет файлов экспорта\n";
-      }
-      else
-      {
-        foreach (var file in files)
-        {
-          FileInfo info = new FileInfo(file);
-          output += $"{Path.GetFileName(file)} - {info.Length} байт - {info.LastWriteTime:dd.MM.yyyy HH:mm}\n";
+      } else {
+        for (int fileIndex = 0; fileIndex < files.Length; ++fileIndex) {
+          string currentFile = files[fileIndex];
+          FileInfo info = new FileInfo(currentFile);
+          output += $"{Path.GetFileName(currentFile)} - {info.Length} байт - {info.LastWriteTime:dd.MM.yyyy HH:mm}\n";
         }
       }
+
       Console.WriteLine(output);
     }
   }
