@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BudgetApp.BudgetApp.Models {
+﻿namespace BudgetApp.BudgetApp.Models {
   // Модель лимита бюджета по категории
   public class BudgetLimit {
     // ========== СВОЙСТВА ==========

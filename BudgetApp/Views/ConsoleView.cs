@@ -1,4 +1,4 @@
-﻿using BudgetApp.Strategy;
+﻿using BudgetApp.BudgetApp.Strategy;
 using BudgetApp.BudgetApp.Controllers;
 using BudgetApp.BudgetApp.Infrastructure;
 using BudgetApp.BudgetApp.Observers;

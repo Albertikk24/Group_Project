@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BudgetApp.BudgetApp.Infrastructure {
+﻿namespace BudgetApp.BudgetApp.Infrastructure {
   // Паттерн Одиночка (Singleton) - потокобезопасный логгер
   public sealed class Logger {
     // ========== ОДИНОЧКА ==========
