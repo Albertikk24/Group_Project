@@ -71,7 +71,7 @@ namespace BudgetApp.Views {
       WaitForUser();
     }
 
-    // ========== ДОБАВЛЕНИЕ РАСХОДА ==========
+    // ========== ДОБАВЛЕНИЕ РАСХОДА (ВЫБОР КАТЕГОРИИ ПО НОМЕРУ) ==========
     private void AddExpense() {
       Console.Clear();
       Console.WriteLine("\n=== ДОБАВЛЕНИЕ РАСХОДА ===\n");
@@ -91,16 +91,24 @@ namespace BudgetApp.Views {
         return;
       }
 
-      _controller.ShowCategories();
-      Console.Write("Выберите категорию: ");
-      string? category = Console.ReadLine();
-      if (string.IsNullOrWhiteSpace(category)) {
-        Console.WriteLine("Ошибка: категория не может быть пустой");
+      // Получаем список категорий и показываем с номерами
+      var categories = _controller.GetCategoriesWithNumbers();
+      
+      string categoryList = "\n=== ДОСТУПНЫЕ КАТЕГОРИИ ===\n";
+      for (int catIndex = 0; catIndex < categories.Count; ++catIndex) {
+        categoryList += $"  {catIndex + 1}. {categories[catIndex]}\n";
+      }
+      Console.Write(categoryList);
+      
+      Console.Write("\nВыберите категорию (номер): ");
+      if (!int.TryParse(Console.ReadLine(), out int categoryNumber) || categoryNumber < 1 || categoryNumber > categories.Count) {
+        Console.WriteLine("Ошибка: неверный номер категории");
         WaitForUser();
         return;
       }
 
-      _controller.AddExpense(description, amount, category);
+      string selectedCategory = categories[categoryNumber - 1];
+      _controller.AddExpense(description, amount, selectedCategory);
       WaitForUser();
     }
 
@@ -114,7 +122,13 @@ namespace BudgetApp.Views {
     // ========== ОТОБРАЖЕНИЕ КАТЕГОРИЙ ==========
     private void ShowCategories() {
       Console.Clear();
-      _controller.ShowCategories();
+      var categories = _controller.GetCategoriesWithNumbers();
+      
+      string output = "\n=== ДОСТУПНЫЕ КАТЕГОРИИ РАСХОДОВ ===\n";
+      for (int catIndex = 0; catIndex < categories.Count; ++catIndex) {
+        output += $"  {catIndex + 1}. {categories[catIndex]}\n";
+      }
+      Console.WriteLine(output);
       WaitForUser();
     }
 
@@ -201,7 +215,7 @@ namespace BudgetApp.Views {
       WaitForUser();
     }
 
-    // ========== УПРАВЛЕНИЕ ЛИМИТАМИ ==========
+    // ========== УПРАВЛЕНИЕ ЛИМИТАМИ (ВЫБОР КАТЕГОРИИ ПО НОМЕРУ) ==========
     private void ManageLimits() {
       Console.Clear();
       string limitsMenu = "\n=== УПРАВЛЕНИЕ ЛИМИТАМИ ===\n";
@@ -221,15 +235,23 @@ namespace BudgetApp.Views {
           WaitForUser();
           break;
         case "2":
-          _controller.ShowCategories();
-          Console.Write("\nНазвание категории: ");
-          string? category = Console.ReadLine();
-          if (string.IsNullOrWhiteSpace(category)) {
-            Console.WriteLine("Ошибка: категория не может быть пустой");
+          // Показать категории с номерами
+          var categories = _controller.GetCategoriesWithNumbers();
+          string categoryList = "\n=== ДОСТУПНЫЕ КАТЕГОРИИ ===\n";
+          for (int catIndex = 0; catIndex < categories.Count; ++catIndex) {
+            categoryList += $"  {catIndex + 1}. {categories[catIndex]}\n";
+          }
+          Console.Write(categoryList);
+          
+          Console.Write("\nВыберите категорию (номер): ");
+          if (!int.TryParse(Console.ReadLine(), out int categoryNumber) || categoryNumber < 1 || categoryNumber > categories.Count) {
+            Console.WriteLine("Ошибка: неверный номер категории");
             WaitForUser();
             return;
           }
 
+          string selectedCategory = categories[categoryNumber - 1];
+          
           Console.Write("Месячный лимит: ");
           if (!decimal.TryParse(Console.ReadLine(), out decimal limit) || limit <= 0) {
             Console.WriteLine("Ошибка: введите корректный положительный лимит");
@@ -237,20 +259,27 @@ namespace BudgetApp.Views {
             return;
           }
 
-          _controller.SetCategoryLimit(category, limit);
+          _controller.SetCategoryLimit(selectedCategory, limit);
           WaitForUser();
           break;
         case "3":
-          _controller.ShowCategories();
-          Console.Write("\nНазвание категории: ");
-          string? catName = Console.ReadLine();
-          if (string.IsNullOrWhiteSpace(catName)) {
-            Console.WriteLine("Ошибка: категория не может быть пустой");
+          // Показать категории с номерами
+          var limitCategories = _controller.GetCategoriesWithNumbers();
+          string limitCategoryList = "\n=== ДОСТУПНЫЕ КАТЕГОРИИ ===\n";
+          for (int catIndex = 0; catIndex < limitCategories.Count; ++catIndex) {
+            limitCategoryList += $"  {catIndex + 1}. {limitCategories[catIndex]}\n";
+          }
+          Console.Write(limitCategoryList);
+          
+          Console.Write("\nВыберите категорию (номер): ");
+          if (!int.TryParse(Console.ReadLine(), out int limitCatNumber) || limitCatNumber < 1 || limitCatNumber > limitCategories.Count) {
+            Console.WriteLine("Ошибка: неверный номер категории");
             WaitForUser();
             return;
           }
 
-          _controller.ShowLimitByCategory(catName);
+          string selectedLimitCategory = limitCategories[limitCatNumber - 1];
+          _controller.ShowLimitByCategory(selectedLimitCategory);
           WaitForUser();
           break;
         case "4":

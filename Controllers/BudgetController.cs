@@ -392,9 +392,18 @@ namespace BudgetApp.Controllers {
     public void ShowCategories() {
       string output = "\n=== ДОСТУПНЫЕ КАТЕГОРИИ РАСХОДОВ ===\n";
       for (int categoryIndex = 0; categoryIndex < _availableCategories.Count; ++categoryIndex) {
-        output += $"  {_availableCategories[categoryIndex]}\n";
+        output += $"  {categoryIndex + 1}. {_availableCategories[categoryIndex]}\n";
       }
       Console.WriteLine(output);
+    }
+
+    // Получение списка названий категорий для выбора по номеру
+    public List<string> GetCategoriesWithNumbers() {
+      List<string> categoryNames = new List<string>();
+      for (int categoryIndex = 0; categoryIndex < _availableCategories.Count; ++categoryIndex) {
+        categoryNames.Add(_availableCategories[categoryIndex].Name);
+      }
+      return categoryNames;
     }
 
     public decimal GetRemainingBudget() {
