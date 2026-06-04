@@ -11,7 +11,8 @@ namespace BudgetApp.Factory {
         new FoodCategoryFactory(),
         new TransportCategoryFactory(),
         new EntertainmentCategoryFactory(),
-        new UtilitiesCategoryFactory()
+        new UtilitiesCategoryFactory(),
+        new WorkCategoryFactory()      // НОВАЯ КАТЕГОРИЯ
       };
     }
 
