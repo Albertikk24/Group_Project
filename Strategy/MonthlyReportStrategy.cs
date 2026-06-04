@@ -1,84 +1,55 @@
 ﻿using BudgetApp.Models;
-using groupProject.Models;
 
-namespace BudgetApp.Strategy
-{
-  public class MonthlyReportStrategy : IReportStrategy
-  {
+namespace BudgetApp.Strategy {
+  // Стратегия: месячный отчет
+  public class MonthlyReportStrategy : IReportStrategy {
     private DateTime _month;
 
-    public MonthlyReportStrategy(DateTime month)
-    {
+    public MonthlyReportStrategy(DateTime month) {
       _month = month;
     }
 
-    public string GenerateReport(Budget budget, List<Expense> expenses)
-    {
-      if (expenses == null || expenses.Count == 0)
-      {
-        return $"\n=== ОТЧЕТ ЗА {_month:MMMM yyyy} ===\nНет расходов за этот период.\n";
+    public string GenerateReport(Budget budget, List<Expense> expenses) {
+      // Фильтрация расходов за указанный месяц
+      List<Expense> monthlyExpenses = new List<Expense>();
+      for (int expenseIndex = 0; expenseIndex < expenses.Count; ++expenseIndex) {
+        Expense currentExpense = expenses[expenseIndex];
+        if (currentExpense.Date.Year == _month.Year && currentExpense.Date.Month == _month.Month) {
+          monthlyExpenses.Add(currentExpense);
+        }
       }
 
-      // Фильтруем расходы за указанный месяц
-      var monthlyExpenses = expenses
-          .Where(e => e.Date.Year == _month.Year && e.Date.Month == _month.Month)
-          .ToList();
-
-      if (monthlyExpenses.Count == 0)
-      {
-        return $"\n=== ОТЧЕТ ЗА {_month:MMMM yyyy} ===\nНет расходов за {_month:MMMM} {_month.Year}.\n";
+      // Подсчет суммы расходов за месяц
+      decimal totalMonthlyExpenses = 0;
+      for (int expenseIndex = 0; expenseIndex < monthlyExpenses.Count; ++expenseIndex) {
+        totalMonthlyExpenses += monthlyExpenses[expenseIndex].Amount;
       }
 
-      decimal totalExpenses = monthlyExpenses.Sum(e => e.Amount);
+      decimal remaining = budget.TotalIncome - totalMonthlyExpenses;
 
-      // Группировка по категориям
-      var categoryTotals = monthlyExpenses
-          .GroupBy(e => e.CategoryName)
-          .Select(g => new { Category = g.Key, Total = g.Sum(e => e.Amount), Count = g.Count() })
-          .OrderByDescending(g => g.Total)
-          .ToList();
+      // Формирование отчета
+      string output = "\n" + new string('=', 50) + "\n";
+      output += $"МЕСЯЧНЫЙ ОТЧЕТ: {_month:MMMM yyyy}\n";
+      output += new string('=', 50) + "\n";
+      output += $"Доходы: {budget.TotalIncome:C}\n";
+      output += $"Расходы: {totalMonthlyExpenses:C}\n";
+      output += $"Остаток: {remaining:C}\n";
+      output += new string('-', 50) + "\n";
 
-      // Самый большой расход за месяц
-      var largestExpense = monthlyExpenses.OrderByDescending(e => e.Amount).FirstOrDefault();
-
-      string report = $"\n=== ОТЧЕТ ЗА {_month:MMMM yyyy} ===\n";
-      report += $"Период: {_month:dd.MM.yyyy} - {_month.AddMonths(1).AddDays(-1):dd.MM.yyyy}\n";
-      report += $"Всего расходов: {totalExpenses:C}\n";
-      report += $"Количество операций: {monthlyExpenses.Count}\n";
-      report += $"Средний расход: {(totalExpenses / monthlyExpenses.Count):C}\n";
-
-      if (largestExpense != null)
-      {
-        report += $"Самый большой расход: {largestExpense.Description} - {largestExpense.Amount:C}\n";
+      if (remaining > 0) {
+        output += $"Можно отложить: {remaining:C}\n";
+      } else if (remaining < 0) {
+        output += $"Перерасход бюджета: {-remaining:C}\n";
+      } else {
+        output += "Бюджет сведен к нулю\n";
       }
 
-      report += $"\n--- РАСХОДЫ ПО КАТЕГОРИЯМ ---\n";
-
-      foreach (var category in categoryTotals)
-      {
-        decimal percentage = (category.Total / totalExpenses) * 100;
-        report += $"{category.Category}: {category.Total:C} ({percentage:F1}%) - {category.Count} операций\n";
-      }
-
-      // Аналитика по бюджету
-      report += $"\n--- АНАЛИТИКА БЮДЖЕТА ---\n";
-      report += $"Доходы: {budget.TotalIncome:C}\n";
-      report += $"Расходы: {totalExpenses:C}\n";
-      report += $"Остаток: {budget.TotalIncome - totalExpenses:C}\n";
-
-      if (budget.TotalIncome > 0)
-      {
-        decimal expenseRate = (totalExpenses / budget.TotalIncome) * 100;
-        report += $"Доля расходов от доходов: {expenseRate:F1}%\n";
-      }
-
-      return report;
+      output += new string('=', 50) + "\n";
+      return output;
     }
 
-    // ========== ДОБАВИТЬ ЭТОТ МЕТОД (если требуется интерфейсом) ==========
-    public string GetReportType()
-    {
-      return $"monthly_report_{_month:yyyyMM}";
+    public string GetReportType() {
+      return "Monthly";
     }
   }
 }

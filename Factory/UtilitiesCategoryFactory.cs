@@ -1,20 +1,19 @@
 ﻿using BudgetApp.Models;
 
-namespace BudgetApp.Factory
-{
-  public class UtilitiesCategoryFactory : ICategoryFactory
-  {
-    public Category CreateCategory()
-    {
+namespace BudgetApp.Factory {
+  // Фабрика для категории "Коммунальные услуги"
+  public class UtilitiesCategoryFactory : ICategoryFactory {
+    private const decimal MONTHLY_LIMIT = 10000m;
+
+    public Category CreateCategory() {
       return new Category(
         name: "Коммунальные услуги",
         description: "Квартплата, электричество, вода, газ",
-        monthlyLimit: 10000m
+        monthlyLimit: MONTHLY_LIMIT
       );
     }
 
-    public string GetCategoryType()
-    {
+    public string GetCategoryType() {
       return "Utilities";
     }
   }

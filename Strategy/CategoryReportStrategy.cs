@@ -1,52 +1,77 @@
 ﻿using BudgetApp.Models;
 
-namespace BudgetApp.Factories
-{
-  public static class CategoryFactoryProvider
-  {
-    private static List<Category> _categories;
+namespace BudgetApp.Strategy {
+  // Паттерн Strategy: стратегия отчета по категориям
+  public class CategoryReportStrategy : IReportStrategy {
+    
+    public string GenerateReport(Budget budget, List<Expense> expenses) {
+      // Проверка входных данных
+      if (budget == null) {
+        return "Ошибка: бюджет не может быть null\n";
+      }
+      if (expenses == null) {
+        return "Ошибка: список расходов не может быть null\n";
+      }
 
-    static CategoryFactoryProvider()
-    {
-      _categories = new List<Category>
-            {
-                new Category("Продукты", "Еда и напитки"),
-                new Category("Транспорт", "Проезд, такси, бензин"),
-                new Category("ЖКХ", "Коммунальные платежи"),
-                new Category("Развлечения", "Кино, рестораны, игры"),
-                new Category("Здоровье", "Лекарства, врачи, спорт"),
-                new Category("Одежда", "Одежда и обувь"),
-                new Category("Образование", "Курсы, книги"),
-                new Category("Прочее", "Прочие расходы")
-            };
+      // Группировка расходов по категориям
+      Dictionary<string, decimal> categoryTotals = new Dictionary<string, decimal>();
+      
+      for (int expenseIndex = 0; expenseIndex < expenses.Count; ++expenseIndex) {
+        Expense currentExpense = expenses[expenseIndex];
+        string categoryName = currentExpense.CategoryName;
+        
+        if (categoryTotals.ContainsKey(categoryName)) {
+          categoryTotals[categoryName] += currentExpense.Amount;
+        } else {
+          categoryTotals[categoryName] = currentExpense.Amount;
+        }
+      }
+
+      // Формирование отчета (один вывод)
+      string output = "\n" + new string('=', 55) + "\n";
+      output += "         ОТЧЕТ ПО КАТЕГОРИЯМ РАСХОДОВ\n";
+      output += new string('=', 55) + "\n\n";
+
+      if (categoryTotals.Count == 0) {
+        output += "  Нет данных о расходах\n";
+      } else {
+        // Список категорий с суммами и процентами
+        foreach (KeyValuePair<string, decimal> item in categoryTotals) {
+          decimal percentage = budget.TotalExpenses > 0 
+            ? (item.Value / budget.TotalExpenses) * 100 
+            : 0;
+          
+          string categoryLine = string.Format("  {0,-25} : {1,12:C}  ({2,5:F1}%)", 
+            item.Key, item.Value, percentage);
+          output += categoryLine + "\n";
+        }
+      }
+
+      output += "\n" + new string('-', 55) + "\n";
+      output += string.Format("  {0,-25} : {1,12:C}\n", 
+        "ИТОГО РАСХОДОВ", budget.TotalExpenses);
+      output += string.Format("  {0,-25} : {1,12:C}\n", 
+        "ДОХОД", budget.TotalIncome);
+      output += string.Format("  {0,-25} : {1,12:C}\n", 
+        "ОСТАТОК", budget.RemainingBudget);
+      output += new string('=', 55) + "\n";
+
+      // Добавление рекомендации
+      if (budget.RemainingBudget < 0) {
+        output += "\n⚠️  ВНИМАНИЕ: Бюджет превышен!\n";
+      } else if (budget.RemainingBudget < budget.TotalIncome * 0.1m) {
+        output += "\n⚠️  ВНИМАНИЕ: Остаток бюджета критически мал!\n";
+      } else if (budget.RemainingBudget > budget.TotalIncome * 0.3m) {
+        output += "\n✅  ОТЛИЧНО: Вы откладываете более 30% дохода!\n";
+      } else {
+        output += "\n📌  Рекомендуется оптимизировать расходы.\n";
+      }
+
+      return output;
     }
 
-    // ВАЖНО: возвращаем List<Category>, а не List<object>!
-    public static List<Category> GetAllCategories()
-    {
-      return new List<Category>(_categories);
-    }
-
-    public static Category GetCategoryByName(string name)
-    {
-      return _categories.Find(c => c.Name == name);
-    }
-
-    public static Category? GetCategoryById(int id)
-    {
-      if (id >= 0 && id < _categories.Count)
-        return _categories[id];
-      return null;
-    }
-
-    public static void AddCategory(string name, string description = "", decimal? monthlyLimit = null)
-    {
-      _categories.Add(new Category(name, description, monthlyLimit));
-    }
-
-    public static bool CategoryExists(string name)
-    {
-      return _categories.Exists(c => c.Name == name);
+    public string GetReportType() {
+      return "CategoryReport";
     }
   }
 }

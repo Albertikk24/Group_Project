@@ -1,14 +1,13 @@
 ﻿using BudgetApp.Infrastructure;
 
 namespace BudgetApp.Observers {
-  // Конкретный наблюдатель - уведомляет пользователя
-  public class UserNotifier : IObserver {
-    // ========== ПОЛЯ ==========
+  // Конкретный наблюдатель: уведомляет пользователя об изменениях бюджета
+  public class BudgetNotifier : IBudgetObserver {
     private string _userName;
     private string _email;
 
     // ========== КОНСТРУКТОР ==========
-    public UserNotifier(string userName, string email) {
+    public BudgetNotifier(string userName, string email) {
       if (string.IsNullOrWhiteSpace(userName)) {
         throw new ArgumentNullException(nameof(userName));
       }
@@ -23,16 +22,9 @@ namespace BudgetApp.Observers {
     // ========== ПОЛУЧЕНИЕ УВЕДОМЛЕНИЯ ==========
     public void Update(string message, decimal currentBudget, decimal remaining) {
       // Определение уровня тревоги
-      string warningLevel = "";
-      if (remaining < 0) {
-        warningLevel = "ВНИМАНИЕ! БЮДЖЕТ ПРЕВЫШЕН!";
-      } else if (remaining < currentBudget * 0.1m) {
-        warningLevel = "БЮДЖЕТ НА ИСХОДЕ!";
-      } else {
-        warningLevel = "Бюджет в порядке";
-      }
+      string warningLevel = GetWarningLevel(remaining, currentBudget);
 
-      // Формирование уведомления в виде таблицы
+      // Формирование уведомления в виде таблицы (один вывод)
       string notification = $@"
 +---------------------------------------------------+
 | УВЕДОМЛЕНИЕ ОБ ИЗМЕНЕНИИ БЮДЖЕТА                  |
@@ -42,17 +34,37 @@ namespace BudgetApp.Observers {
 | Текущий бюджет: {currentBudget:C}
 | Остаток: {remaining:C}
 +---------------------------------------------------+
-|
-| {warningLevel}
+| Статус: {warningLevel}
 +---------------------------------------------------+";
 
       Console.WriteLine(notification);
       Logger.Instance.Log($"Уведомление отправлено {_userName}: {message}");
     }
 
+    // Определение уровня тревоги на основе остатка
+    private string GetWarningLevel(decimal remaining, decimal currentBudget) {
+      if (remaining < 0) {
+        return "КРИТИЧЕСКИЙ ПЕРЕРАСХОД!";
+      }
+      if (remaining < currentBudget * 0.1m) {
+        return "БЮДЖЕТ НА ИСХОДЕ!";
+      }
+      if (remaining < currentBudget * 0.25m) {
+        return "ОСТАТОК МАЛ";
+      }
+      if (remaining > currentBudget * 0.5m) {
+        return "ОТЛИЧНАЯ ЭКОНОМИЯ";
+      }
+      return "Бюджет в порядке";
+    }
+
     // ========== ПОЛУЧЕНИЕ ДАННЫХ ==========
     public string GetObserverName() {
       return _userName;
+    }
+
+    public string GetObserverRole() {
+      return "Пользователь";
     }
   }
 }

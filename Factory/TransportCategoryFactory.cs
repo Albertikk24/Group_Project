@@ -1,20 +1,19 @@
 ﻿using BudgetApp.Models;
 
-namespace BudgetApp.Factory
-{
-  public class TransportCategoryFactory : ICategoryFactory
-  {
-    public Category CreateCategory()
-    {
+namespace BudgetApp.Factory {
+  // Фабрика для категории "Транспорт"
+  public class TransportCategoryFactory : ICategoryFactory {
+    private const decimal MONTHLY_LIMIT = 5000m;
+
+    public Category CreateCategory() {
       return new Category(
         name: "Транспорт",
         description: "Бензин, такси, общественный транспорт",
-        monthlyLimit: 5000m
+        monthlyLimit: MONTHLY_LIMIT
       );
     }
 
-    public string GetCategoryType()
-    {
+    public string GetCategoryType() {
       return "Transport";
     }
   }
